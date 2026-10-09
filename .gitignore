@@ -1,0 +1,41 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+env/
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Secrets
+.env
+*.key
+secrets*
+
+# Logs and run outputs (keep the folder, not the contents)
+*.log
+logs/
+results/*
+!results/.gitkeep
+
+# Large / binary data and model weights (full data is NOT committed)
+data/full/
+data/raw/
+*.bin
+*.safetensors
+*.pt
+*.pth
+*.ckpt
+*.gguf
+*.parquet
+*.npy
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
