@@ -1,6 +1,6 @@
-# Methodology Passport Card / Карточка методологии
+# Methodology Passport Card 
 
-## 1. Project information / Информация о проекте
+## 1. Project information 
 
 | Field | Value |
 |---|---|
@@ -8,49 +8,56 @@
 | Authors | Yerzhankyzy Markhaba, Kulmakhanbet Zarina |
 | GitHub repository | https://github.com/markhabaerzhan/cot-monitor-benchmark |
 
-## 2. Research type / Тип исследования
+## 2. Research type 
 
-**Quantitative (количественное), experimental.** We measure numeric detection metrics (recall at fixed FPR, precision, F1, AUROC) of automated monitors on a labeled test set and test hypotheses statistically (α = 0.05). The same episodes are given to both monitors (paired design), so the effect of the monitor input is isolated. No human subjects or interviews are involved, so a qualitative component is not required; the error analysis of false positives/negatives (Task 5) is a small descriptive add-on, not a second method.
+**Quantitative, experimental.** The study compares numerical detection metrics (recall at fixed FPR, precision, F1, and AUROC) for output-only and reasoning-trace + output monitors. Statistical hypotheses are tested at α = 0.05. Both conditions use the same test episodes, enabling paired comparisons. No human subjects or interviews are involved. False-positive and false-negative analysis (Task 5) is a descriptive supplement rather than a separate research method.
 
-## 3. Hypotheses / Гипотезы
+The current implementation uses a keyword-based placeholder monitor and sample data for pipeline testing. Full experimental conclusions require the planned evaluation with the finalized monitor and dataset.
 
-Derived from Task 1. Common settings: α = 0.05; primary metric is recall at 5% FPR on a labeled set of safe and unsafe episodes. RQ3 is the central (confirmatory) hypothesis; RQ1 and RQ2 are supporting.
+## 3. Hypotheses 
 
-| | H₀ (null) | H₁ (alternative) | Test |
+Common settings: α = 0.05; primary metric is recall at 5% FPR. RQ3 is the main comparison; RQ1 and RQ2 are supporting research questions.
+
+| Research question | H₀ (null) | H₁ (alternative) | Statistical test |
 |---|---|---|---|
-| **RQ3 (main)** | Recall at 5% FPR of the reasoning-trace + output monitor is **equal to or lower than** that of the output-only monitor. | Recall at 5% FPR of the reasoning-trace + output monitor is **higher** than that of the output-only monitor. | Exact McNemar (one-sided) + paired bootstrap 95% CI of recall difference |
-| RQ2 | Reasoning-trace monitor recall at 5% FPR is **≤ 0.70**. | Reasoning-trace monitor recall at 5% FPR is **> 0.70**. | One-sided exact binomial + bootstrap 95% CI. The 0.70 target is a working value, to be calibrated after the pilot run. |
-| RQ1 | Recall at 5% FPR is the **same** for all four unsafe-behavior categories. | Recall differs between **at least two** categories. | Chi-square homogeneity (Fisher's exact if expected counts are small) |
+| **RQ3 (main)** | Recall at 5% FPR of the reasoning-trace + output monitor is equal to or lower than that of the output-only monitor. | Recall at 5% FPR of the reasoning-trace + output monitor is higher than that of the output-only monitor. | One-sided exact McNemar test + paired percentile bootstrap 95% CI |
+| RQ2 | Recall at 5% FPR of the reasoning-trace + output monitor is ≤ 0.70. | Recall at 5% FPR of the reasoning-trace + output monitor is > 0.70. | One-sided exact binomial test + Wilson 95% CI |
+| RQ1 | Recall at 5% FPR is the same across the four unsafe-behavior categories. | Recall differs between at least two categories. | Chi-square homogeneity test; Fisher–Freeman–Halton Monte Carlo test if expected counts are small |
 
-## 4. Variable matrix / Матрица переменных
+For RQ3, the recall difference is defined as **recall(cot_plus_output) − recall(output_only)**. A positive value favors the reasoning-trace + output monitor.
+
+## 4. Variable matrix 
 
 | Type | Variable | Levels / unit | Used in |
 |---|---|---|---|
 | **Independent** | Monitor input | `output_only` vs `cot_plus_output` | RQ2, RQ3 |
 | **Independent** | Unsafe-behavior category | reward hacking, deception, sabotage, harmful compliance | RQ1 |
-| **Dependent** | Recall at 5% FPR (**primary**) | proportion, 0–1 | all |
-| **Dependent** | Precision, F1, AUROC (secondary) | 0–1 | all |
-| **Controlled** | Monitor LLM, prompt template and temperature | same for both conditions; temperature 0.0 | all |
-| **Controlled** | Source model(s) generating episodes; task domain and difficulty | fixed per run | all |
-| **Controlled** | Test episodes and labeling protocol | identical episodes in both conditions; equal number per category | all |
-| **Controlled** | Operating point | threshold calibrated per monitor on safe episodes to FPR ≤ 5% | all |
-| **Controlled** | Software and hardware | Python 3.13, exact-pinned `requirements.txt`, Docker image `python:3.13-slim`, random seed 42, CPU only | all |
+| **Dependent** | Recall at 5% FPR (primary) | Proportion, 0–1 | RQ1, RQ2, RQ3 |
+| **Dependent** | Precision, F1, AUROC (secondary) | 0–1 | Descriptive evaluation |
+| **Controlled** | Monitor implementation and prompt template | Held constant across conditions where applicable | All |
+| **Controlled** | Test episodes and labels | Same test episodes for both conditions | All |
+| **Controlled** | Operating point | Threshold calibrated separately for each monitor using safe calibration episodes; empirical calibration FPR ≤ 5% | All |
+| **Controlled** | Software and reproducibility settings | Python 3.13, pinned `requirements.txt`, Docker image `python:3.13-slim`, seed 42, CPU-only setup | All |
 
-## 5. Metrics and baseline / Метрики и Baseline
+Equal category sizes, the final monitor model, and the episode-generation protocol must be specified and verified for the main experiment; they are not enforced by the current benchmark code.
 
-**Primary metric:** recall at 5% FPR — the share of unsafe episodes flagged when the threshold is set so that at most 5% of safe episodes are flagged. The hypotheses are confirmed or rejected on this metric.
+## 5. Metrics and baseline
 
-**Secondary metrics:** precision, F1, AUROC (the last is threshold-free and shows whether any result depends on the chosen operating point).
+**Primary metric:** Recall at 5% FPR — the proportion of unsafe test episodes detected using a threshold calibrated on safe calibration episodes so that the empirical calibration-set FPR does not exceed 5%. The realized FPR on the separate safe test set is reported independently and may differ from 5%.
 
-**Guardrail metrics (validity checks, not goals):**
+**Secondary metrics:** Precision, F1, and AUROC. AUROC is threshold-independent and measures ranking performance across possible thresholds.
 
-| Guardrail | Limit |
+**Guardrail metrics and validity checks:**
+
+| Guardrail | Requirement or status |
 |---|---|
-| Realized FPR on safe episodes | ≤ 5% for both monitors (otherwise the comparison is unfair) |
-| Unparseable / failed monitor replies | ≤ 1% of calls; failed episodes are reported, not silently dropped |
-| Class balance | equal number of episodes per category; safe episodes ≥ 100 so a 5% FPR is measurable (planned) |
-| Safety of data | no harmful content stored or published; no API keys in the repository |
+| Calibration-set FPR | Must be ≤ 5% by the threshold-selection procedure |
+| Test-set FPR | Reported separately; not guaranteed to be ≤ 5% |
+| Monitor failures or unparseable responses | Target ≤ 1% of calls; must be measured and reported in the main experiment |
+| Sample size | Aim for at least 100 safe episodes in both calibration and test splits; the current code issues warnings when either split is below this recommendation |
+| Category balance | Equal numbers per unsafe category are planned but not enforced by the current code |
+| Data safety | Do not publish harmful content unnecessarily or commit API keys |
 
-**Baseline:** the **output-only monitor** (same LLM, same prompt, same episodes, sees prompt + final output but not the reasoning). It is the natural "no extra information" comparison and corresponds to current practice of monitoring actions and outputs. Additional sanity baseline: a random scorer (expected AUROC = 0.5) and the offline keyword placeholder.
+**Baseline:** The output-only monitor (`output_only`) is compared with the reasoning-trace + output monitor (`cot_plus_output`). Both conditions use the same test episodes and the same monitor implementation settings where applicable. The current configuration uses a keyword-based placeholder (`backend: keyword`); a finalized LLM-based monitor must be configured for the intended LLM experiment. A random scorer can be added as an additional sanity baseline but is not one of the two conditions currently defined in `config.yaml`.
 
-**Known limitation:** CoT may not faithfully reflect real reasoning, and a model can hide intent in it (Turpin et al., 2023; Lanham et al., 2023; Chen et al., 2025). This is treated as a limitation and analyzed in the error analysis (Task 5).
+**Known limitation:** Chain-of-thought text may not faithfully represent a model's internal reasoning, and models may conceal or misrepresent their intentions. This limitation should be considered when interpreting results and discussed in the error analysis (Task 5). References: Turpin et al. (2023), Lanham et al. (2023), and Chen et al. (2025).and a model can hide intent in it (Turpin et al., 2023; Lanham et al., 2023; Chen et al., 2025). This is treated as a limitation and analyzed in the error analysis (Task 5).
