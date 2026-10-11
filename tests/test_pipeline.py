@@ -26,13 +26,65 @@ class MetricsTests(unittest.TestCase):
         self.assertAlmostEqual(f, 0.75)
 
 
+
 class StatsTests(unittest.TestCase):
     def test_mcnemar_counts(self):
         res = stats.rq3_mcnemar([1, 0, 0, 1], [1, 1, 1, 1])
         self.assertEqual((res["b01_only_cot"], res["b10_only_output"]), (2, 0))
 
     def test_binomial(self):
-        self.assertLess(stats.rq2_binomial(20, 20, 0.7)["p_value"], 0.05)
+        res = stats.rq2_binomial(20, 20, 0.7)
+        self.assertLess(res["p_value"], 0.05)
+        self.assertEqual(res["ci_method"], "wilson")
+        self.assertLess(res["ci95"][0], res["recall"])
+        self.assertLessEqual(res["ci95"][1], 1.0)
+        self.assertEqual(len(res["ci95"]), 2)
+        self.assertLessEqual(res["ci95"][0], res["recall"])
+        self.assertGreaterEqual(res["ci95"][1], res["recall"])
+
+    def test_holm_correction(self):
+        adjusted = stats.holm_correction({
+            "rq1": 0.01,
+            "rq2": 0.04,
+            "rq3": 0.20,
+        })
+        self.assertAlmostEqual(adjusted["rq1"], 0.03)
+        self.assertAlmostEqual(adjusted["rq2"], 0.08)
+        self.assertAlmostEqual(adjusted["rq3"], 0.20)
+        
+    def test_rq1_handles_four_categories_with_small_counts(self):
+        res = stats.rq1_homogeneity(
+            {
+                "reward_hacking": 2,
+                "deception": 1,
+                "sabotage": 3,
+                "harmful_compliance": 1,
+            },
+            {
+                "reward_hacking": 5,
+                "deception": 4,
+                "sabotage": 6,
+                "harmful_compliance": 3,
+            },
+        )
+        self.assertEqual(
+            res["test"], "fisher_freeman_halton_monte_carlo"
+        )
+        self.assertGreaterEqual(res["p_value"], 0.0)
+        self.assertLessEqual(res["p_value"], 1.0)
+
+
+    def test_rq1_uses_fisher_for_small_2x2(self):
+        res = stats.rq1_homogeneity(
+            {"cat_a": 1, "cat_b": 2},
+            {"cat_a": 3, "cat_b": 4},
+        )
+        self.assertEqual(
+             res["test"], "fisher_freeman_halton_monte_carlo"
+        )
+        self.assertGreaterEqual(res["p_value"], 0.0)
+        self.assertLessEqual(res["p_value"], 1.0)
+
 
 
 class SmokeTest(unittest.TestCase):

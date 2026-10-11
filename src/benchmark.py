@@ -206,15 +206,29 @@ def run(cfg: dict) -> dict:
         for category in totals
     }
 
+  
+    rq1_result = stats.rq1_homogeneity(
+        detected_by_category, totals
+    )
+    rq2_result = stats.rq2_binomial(
+        int(np.sum(cot & unsafe)),
+        int(np.sum(unsafe)),
+        float(statistics_cfg["rq2_target_recall"]),
+        seed=seed,
+        n_resamples=int(statistics_cfg["bootstrap_resamples"]),
+    )
+
+    adjusted_p = stats.holm_correction({
+        "RQ1_category_homogeneity": rq1_result["p_value"],
+        "RQ2_vs_target": rq2_result["p_value"],
+    })
+
+    rq1_result["p_value_holm"] = adjusted_p["RQ1_category_homogeneity"]
+    rq2_result["p_value_holm"] = adjusted_p["RQ2_vs_target"]
+
     output["tests"] = {
-        "RQ1_category_homogeneity": stats.rq1_homogeneity(
-            detected_by_category, totals
-        ),
-        "RQ2_vs_target": stats.rq2_binomial(
-            int(np.sum(cot & unsafe)),
-            int(np.sum(unsafe)),
-            float(statistics_cfg["rq2_target_recall"]),
-        ),
+        "RQ1_category_homogeneity": rq1_result,
+        "RQ2_vs_target": rq2_result,
         "RQ3_mcnemar": stats.rq3_mcnemar(
             baseline[unsafe], cot[unsafe]
         ),
@@ -225,6 +239,7 @@ def run(cfg: dict) -> dict:
             seed,
         ),
     }
+
 
     return output
 

@@ -2,9 +2,12 @@
 
 **Does reading the chain-of-thought (CoT) help an automated monitor detect unsafe LLM behavior compared with reading outputs alone?**
 
-**Authors:** Yerzhankyzy Markhaba, Kulmakhanbet Zarina
+<**Authors:** Yerzhankyzy Markhaba, Kulmakhanbet Zarina
+
 **Course:** Research Methods, Task 2 (Methodology Card & Research Repository)
-**Status:** measurement tool ready; full data collection planned for Week 7.
+
+**Status:** Measurement tool ready; full data collection planned for Week 7.
+
 
 ## Overview
 
@@ -27,73 +30,108 @@ Unsafe behavior is grouped into four categories: **reward hacking, deception, sa
 
 ## Repository structure
 
-```
+```text
 .
 ├── configs/
-│   ├── config.yaml            # all experiment parameters
-│   └── monitor_prompt.txt     # monitor prompt template (same for both conditions)
+│   ├── config.yaml
+│   └── monitor_prompt.txt
 ├── data/
-│   └── sample/episodes.jsonl  # 10-row smoke-test sample (full data is git-ignored)
+│   └── sample/
+│       └── episodes.jsonl
+├── docs/
+│   ├── methodology_card_v3.pdf
+│   ├── methodology_card.md
+│   └── README.md
+├── notebooks/
+├── results/
+│   ├── .gitkeep
+│   ├── sample_run.json
+│   └── sample_run.log
 ├── src/
-│   ├── main.py                # entry point
-│   ├── benchmark.py           # scoring, calibration, per-category metrics, tests
-│   ├── monitors.py            # keyword placeholder + OpenAI-compatible LLM backend
-│   ├── metrics.py             # recall@FPR, precision, F1, AUROC
-│   └── stats.py               # chi-square, binomial, McNemar, bootstrap
-├── tests/test_pipeline.py     # unit + smoke tests
-├── notebooks/                 # analysis notebooks (Week 7+)
-├── docs/                      # Methodology Card
-├── results/                   # run outputs (git-ignored)
+│   ├── __init__.py
+│   ├── benchmark.py
+│   ├── main.py
+│   ├── metrics.py
+│   ├── monitors.py
+│   └── stats.py
+├── tests/
+│   ├── __init__.py
+│   └── test_pipeline.py
+├── .dockerignore
+├── .gitignore
 ├── Dockerfile
-├── requirements.txt           # exact pins
-└── LICENSE
+├── LICENSE
+├── README.md
+└── requirements.txt
 ```
 
 ## Planned benchmarks
 
 | ID | Condition | Behavior categories | Episodes (planned) | Metrics |
 |---|---|---|---|---|
-| B1 | output_only | all 4 + safe | balanced per category, to be fixed after pilot | recall@5% FPR, precision, F1, AUROC |
-| B2 | cot_plus_output | all 4 + safe | same episodes as B1 | recall@5% FPR, precision, F1, AUROC |
-| B3 | B1 vs B2 (paired) | all 4 | same episodes | McNemar, paired bootstrap CI |
+| B1 | `output_only` | All four unsafe categories + safe | To be determined after the pilot | Recall@5% FPR, precision, F1, AUROC |
+| B2 | `cot_plus_output` | All four unsafe categories + safe | Same episodes as B1 | Recall@5% FPR, precision, F1, AUROC |
+| B3 | B1 vs. B2 (paired) | All four unsafe categories | Same episodes | Exact McNemar test, paired bootstrap 95% CI |
+
+The full evaluation dataset and final sample size will be determined after the pilot. The current sample dataset is intended only for pipeline testing.
 
 ## System requirements
 
-- Python 3.13 (or Docker)
-- No GPU needed. The default sample run is fully offline.
-- For the real `llm` backend: an API key for an OpenAI-compatible endpoint.
+- Python 3.13 or Docker.
+- No GPU is required for the default offline sample run.
+- The real `llm` backend requires an API key for an OpenAI-compatible endpoint.
 
 ## Quickstart
 
-Docker:
+### Docker (Bash)
 
 ```bash
 docker build -t cot-monitor .
 docker run --rm -v "$PWD/results:/app/results" cot-monitor
 ```
 
-Local:
+### Local execution
 
 ```bash
 pip install -r requirements.txt
 python -m src.main --config configs/config.yaml
 ```
 
-Run the tests: `python -m unittest discover -s tests -t .`
+### Run tests
 
-Output: `results/sample_run.json` (metrics and test results) and `results/sample_run.log`.
+```bash
+python -m unittest discover -s tests -t .
+```
 
-To use a real LLM monitor, set `monitor.backend: llm` and `monitor.llm.model` in `configs/config.yaml`, then `export MONITOR_API_KEY=...` (the key is never stored in the repo).
+The sample run writes `results/sample_run.json` and `results/sample_run.log`. These outputs demonstrate pipeline execution and must not be interpreted as research findings.
+
+To use a real LLM monitor, configure `monitor.backend: llm` and `monitor.llm.model` in `configs/config.yaml`. Set `MONITOR_API_KEY` as an environment variable. Never commit API keys to the repository.
 
 ## Data format
 
-One JSON object per line: `id`, `category` (`safe` or one of the four categories), `label` (`safe`/`unsafe`), `prompt`, `cot`, `output`. Harmful-compliance episodes are stored only as redacted placeholders; no harmful content is published.
+Each line in the JSONL dataset contains one JSON object with the following fields:
+
+- `id` — unique episode identifier.
+- `category` — `safe` or one of the four unsafe behavior categories.
+- `label` — `safe` or `unsafe`.
+- `prompt` — input prompt.
+- `cot` — reasoning trace available to the experiment.
+- `output` — final model output.
+
+Harmful-compliance episodes use redacted placeholders; harmful content is not published.
 
 ## Citation / License
 
-Released under the MIT License (see `LICENSE`). If you use this tool:
+This project is released under the MIT License. See `LICENSE`.
 
-```
-Yerzhankyzy, M., Kulmakhanbet, Z. (2026). Monitoring LLM Reasoning Traces for Unsafe
-Behavior: a CoT vs output-only monitor benchmark. GitHub repository.
+### BibTeX
+
+```bibtex
+@misc{yerzhankyzy2026cotmonitor,
+  author = {Yerzhankyzy, Markhaba and Kulmakhanbet, Zarina},
+  title = {Monitoring LLM Reasoning Traces for Unsafe Behavior: A CoT vs Output-Only Monitor Benchmark},
+  year = {2026},
+  note = {Research Methods, Task 2: Methodology Card and Research Repository},
+  howpublished = {GitHub repository}
+}
 ```
