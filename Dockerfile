@@ -10,5 +10,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
-# Default: smoke run on the 10-row sample with the offline placeholder monitor
+EXPOSE 8888
+
+# Default: run the sample benchmark
 CMD ["python", "-m", "src.main", "--config", "configs/config.yaml"]
