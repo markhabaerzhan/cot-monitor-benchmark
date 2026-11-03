@@ -49,3 +49,7 @@ statistics:
 output:
   dir: results
   run_name: sample_run
+
+collection:
+  warmup_repeats: 1
+  benchmark_repeats: 5
