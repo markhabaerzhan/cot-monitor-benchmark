@@ -1,0 +1,53 @@
+\documentclass[conference]{IEEEtran}
+
+% Essential packages
+\usepackage[T1]{fontenc}
+\usepackage{cite}
+\usepackage{amsmath,amssymb}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{hyperref}
+\usepackage{url}
+
+\title{Monitoring LLM Reasoning Traces for Unsafe Behavior}
+
+\author{
+\IEEEauthorblockN{Author One and Author Two}
+\IEEEauthorblockA{Narxoz University\\
+Almaty, Kazakhstan}
+}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+Large language models (LLMs) can produce outputs that are misleading,
+harmful, or inconsistent with intended behavior. This project studies
+whether access to a model's reasoning trace, in addition to its prompt and
+final output, can help a monitor identify unsafe behavior. We compare two
+monitoring conditions: output-only monitoring and monitoring that receives
+the prompt, reasoning trace, and final output. The experiment considers
+reward hacking, deception, sabotage, and harmful compliance. We describe
+the monitoring setup and evaluation plan, with particular attention to
+recall at a fixed false-positive rate. The current implementation uses a
+keyword-based monitoring baseline; therefore, conclusions are limited to
+the tested dataset and monitor rather than generalized to all LLMs.
+\end{abstract}
+
+\begin{IEEEkeywords}
+large language models, AI safety, chain-of-thought, monitoring,
+unsafe behavior, classification
+\end{IEEEkeywords}
+
+\input{sections/01_introduction}
+\input{sections/02_methodology}
+
+% Add these sections after the corresponding experiments have been evaluated:
+% \input{sections/03_results}
+% \input{sections/04_discussion}
+% \input{sections/05_limitations_conclusion}
+
+\bibliographystyle{IEEEtran}
+\bibliography{references}
+
+\end{document}

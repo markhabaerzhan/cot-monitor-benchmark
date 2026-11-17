@@ -1,0 +1,74 @@
+
+\section{Introduction}
+\label{sec:introduction}
+
+Large language models (LLMs) are increasingly used in systems that
+generate text, assist with decisions, and interact with digital
+environments. Their usefulness also creates safety challenges: a model
+may produce harmful instructions, conceal its behavior, manipulate an
+evaluation process, or otherwise act contrary to the system's intended
+objectives. Reliable monitoring is therefore an important part of
+evaluating and deploying LLM-based systems.
+
+A monitor can inspect different parts of a model interaction. An
+output-only monitor receives the user's prompt and the model's final
+answer. A more information-rich monitor may also receive an available
+reasoning trace, often referred to as chain-of-thought (CoT). In
+principle, additional context may expose signals that are not visible in
+the final answer alone. However, access to a reasoning trace does not
+automatically guarantee more accurate detection: the trace may be
+incomplete, noisy, unavailable, or may not faithfully represent the
+model's internal computation.
+
+This creates the research problem addressed in this project: whether
+including a reasoning trace changes the ability of a monitor to identify
+unsafe behavior under a controlled evaluation setup. We compare two
+conditions: (1) output-only monitoring, which uses the prompt and final
+output, and (2) CoT-plus-output monitoring, which uses the prompt,
+reasoning trace, and final output. The study focuses on four categories
+of unsafe behavior: reward hacking, deception, sabotage, and harmful
+compliance.
+
+The research gap is the need to evaluate the effect of the information
+available to a monitor while keeping the monitoring approach and
+evaluation conditions explicit. This project provides a controlled
+comparison of the two input conditions using the benchmark data and
+keyword-based monitoring implementation available in the repository.
+Because the current monitor is a keyword baseline, the study should be
+interpreted as an evaluation of this baseline and dataset, not as proof
+that reasoning traces universally improve LLM safety monitoring.
+
+The research questions are:
+
+\begin{itemize}
+    \item \textbf{RQ1:} How does access to a reasoning trace affect the
+    monitor's ability to detect unsafe behavior compared with
+    output-only monitoring?
+
+    \item \textbf{RQ2:} What is the recall of each monitoring condition
+    at a target false-positive rate of 5\%?
+
+    \item \textbf{RQ3:} How do the monitoring conditions compare in
+    operational performance, particularly latency, under the tested
+    request loads?
+\end{itemize}
+
+The contributions of this project are:
+
+\begin{itemize}
+    \item A comparison of output-only and CoT-plus-output monitoring
+    conditions.
+
+    \item An evaluation framework focused on unsafe-behavior categories
+    including reward hacking, deception, sabotage, and harmful compliance.
+
+    \item An analysis plan that considers detection quality at a fixed
+    false-positive rate and operational latency.
+
+    \item A reproducible experimental configuration and processing
+    workflow for the benchmark.
+\end{itemize}
+
+The remainder of the paper describes the experimental methodology,
+reports the measured results, discusses their implications and
+limitations, and concludes with directions for future work.

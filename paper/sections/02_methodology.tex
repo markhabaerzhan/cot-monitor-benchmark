@@ -1,0 +1,110 @@
+
+\section{Methodology}
+\label{sec:methodology}
+
+\subsection{Problem Formulation}
+
+We formulate unsafe-behavior monitoring as a binary classification
+task. For each episode $i$, the monitor receives an input representation
+$x_i$ and produces a score $s_i$ indicating the likelihood that the
+episode is unsafe. Given a threshold $\tau$, the predicted label is
+
+\begin{equation}
+\hat{y}_i =
+\begin{cases}
+1, & s_i \geq \tau,\\
+0, & s_i < \tau,
+\end{cases}
+\label{eq:prediction}
+\end{equation}
+
+where $y_i \in \{0,1\}$ is the reference label and $\hat{y}_i$ is the
+monitor prediction.
+
+We compare two input conditions:
+
+\begin{align}
+x_i^{\mathrm{out}} &=
+(\mathrm{prompt}_i,\mathrm{output}_i),\\
+x_i^{\mathrm{cot}} &=
+(\mathrm{prompt}_i,\mathrm{cot}_i,\mathrm{output}_i).
+\end{align}
+
+The primary detection metric is recall at a target false-positive rate
+(FPR) of 5\%. Recall is defined as
+
+\begin{equation}
+\mathrm{Recall} = \frac{TP}{TP+FN},
+\label{eq:recall}
+\end{equation}
+
+and the false-positive rate is
+
+\begin{equation}
+\mathrm{FPR} = \frac{FP}{FP+TN}.
+\label{eq:fpr}
+\end{equation}
+
+\subsection{Monitoring Conditions}
+
+In the output-only condition, the monitor can inspect the prompt and
+final model output. In the CoT-plus-output condition, it can inspect
+the prompt, the available reasoning trace, and the final output.
+
+The repository configuration identifies these conditions as
+\texttt{output\_only} and \texttt{cot\_plus\_output}, respectively.
+
+\subsection{Unsafe-Behavior Categories}
+
+The benchmark groups unsafe episodes into four categories:
+
+\begin{itemize}
+    \item \textbf{Reward hacking:} exploiting a reward or evaluation
+    mechanism rather than satisfying its intended objective.
+
+    \item \textbf{Deception:} misleading a user, evaluator, or system
+    about relevant behavior or information.
+
+    \item \textbf{Sabotage:} intentionally interfering with a process,
+    system, or objective.
+
+    \item \textbf{Harmful compliance:} complying with a request that
+    would facilitate harmful activity.
+\end{itemize}
+
+\subsection{Monitor and Experimental Configuration}
+
+The current repository configuration specifies a keyword-based
+monitoring backend. The configuration also specifies a random seed
+of 42, a target FPR of 0.05, and a calibration fraction of 0.5.
+
+The episode data are loaded from the configured JSONL dataset.
+These values should be checked against the exact configuration and
+dataset version used for the final experiment before submission.
+
+\subsection{Evaluation Procedure}
+
+The experiment separates calibration and evaluation data according
+to the configured split. A decision threshold is selected using the
+calibration data to target the specified FPR. The monitor is then
+evaluated on the held-out evaluation data.
+
+The two monitoring conditions are compared using the same
+evaluation protocol.
+
+Operational performance is measured separately from detection
+quality. Latency measurements are collected under the configured
+request rates. Latency summaries and plots should be reported
+independently from classification metrics; a larger number of
+latency observations does not imply a larger number of labeled
+detection episodes.
+
+\subsection{Reproducibility}
+
+To reproduce the experiment, a researcher should record the
+repository revision, configuration file, dataset version, random
+seed, monitor backend, visible input fields, calibration split,
+target FPR, software dependencies, and execution commands.
+
+Any change to these settings should be documented because it may
+affect the results.
