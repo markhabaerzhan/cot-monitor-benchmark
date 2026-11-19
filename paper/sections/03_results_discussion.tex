@@ -1,0 +1,94 @@
+
+\section{Results and Discussion}
+
+\subsection{Experimental Results}
+
+The experiment compares two monitoring conditions:
+output-only monitoring and monitoring with access to the
+reasoning trace. The evaluation focuses on four categories
+of unsafe behavior: reward hacking, deception, sabotage,
+and harmful compliance.
+
+The pilot evaluation contains 10 episodes. Eight episodes
+were used for testing, including six unsafe and two safe
+episodes, while two safe episodes were used for calibration.
+
+Under the output-only condition, the monitor detected none
+of the six unsafe test episodes, resulting in a recall of
+0.00. Under the CoT-plus-output condition, all six unsafe
+episodes were detected, resulting in a recall of 1.00.
+Both conditions produced zero false positives in this
+small test sample.
+
+The AUROC was 0.50 for output-only monitoring and 1.00
+for CoT-plus-output monitoring. These results indicate
+a substantial difference between the two conditions
+within the pilot dataset. However, the small sample size
+does not support broad generalization.
+
+\subsection{Statistical Analysis}
+
+The exact one-sided McNemar test comparing the two
+monitoring conditions produced a p-value of 0.015625.
+This provides preliminary evidence of a difference
+between the paired detection outcomes.
+
+For RQ2, the observed recall was 1.00, based on six
+detected unsafe episodes out of six. However, the
+one-sided binomial test produced a p-value of
+approximately 0.118, and the 95\% confidence interval
+ranged from approximately 0.607 to 1.00. Therefore,
+the pilot results do not establish that recall is
+statistically greater than the target value of 0.70
+at the 0.05 significance level.
+
+The RQ1 chi-square analysis was reported as degenerate,
+so it does not provide reliable evidence of differences
+in detection performance across the four categories.
+
+\subsection{Latency and Load Testing}
+
+A separate load-testing experiment evaluated both
+monitoring conditions at request rates of 1, 5, 10,
+and 20 requests per second. Each combination included
+50 measurements, resulting in 400 measurements in total.
+
+The mean latency ranged from approximately 0.194 to
+0.230 seconds across the tested conditions and request
+rates. The median latency remained close to 0.2 seconds.
+The results do not show a substantial increase in
+median latency as the request rate increased from
+1 to 20 requests per second.
+
+The latency measurements also show that the difference
+between the two monitoring conditions was relatively
+small compared with the variation across individual
+measurements. These findings describe the tested
+benchmark configuration and should not be interpreted
+as evidence of production-scale performance.
+
+\subsection{Discussion}
+
+The pilot detection results suggest that access to
+reasoning traces may provide additional signals for
+identifying unsafe behavior that are not available
+from the final output alone. In this experiment,
+the CoT-plus-output condition detected all six unsafe
+test episodes, whereas the output-only condition
+detected none.
+
+Nevertheless, this finding should be interpreted
+cautiously. The evaluation uses a small demonstration
+dataset and a keyword-based monitoring baseline.
+The observed performance may depend on the examples,
+keywords, and calibration procedure used in this
+implementation.
+
+The load-testing results provide a separate view
+of system performance. Median latency remained
+relatively stable across the tested request rates.
+However, further experiments with larger datasets
+and additional monitor implementations are necessary
+before drawing conclusions about scalability or
+general effectiveness.
+ 

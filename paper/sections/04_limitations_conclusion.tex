@@ -1,0 +1,72 @@
+
+\section{Limitations and Conclusion}
+
+\subsection{Limitations}
+
+This study has several limitations. First, the pilot
+evaluation uses only 10 episodes, with six unsafe
+episodes in the test set. This sample is too small
+to support broad conclusions about monitoring
+effectiveness.
+
+Second, the experiment uses a keyword-based monitoring
+baseline. Its detection performance may depend on
+the selected keywords and the wording of the examples.
+Therefore, the results should not be generalized to
+more advanced LLM-based monitors.
+
+Third, only four categories of unsafe behavior are
+considered: reward hacking, deception, sabotage, and
+harmful compliance. Other forms of unsafe behavior
+are outside the scope of the current dataset.
+
+Finally, the load-testing results were obtained under
+a specific benchmark configuration. They do not
+necessarily represent performance in real-world
+production environments.
+
+\subsection{Conclusion}
+
+This study investigated whether access to reasoning
+traces can improve the detection of unsafe behavior
+in large language models. Three research questions
+guided the investigation.
+
+For RQ1, the category-level statistical analysis was
+degenerate and did not provide sufficient evidence
+to establish differences between categories.
+
+For RQ2, the observed recall in the CoT-plus-output
+condition was 1.00. However, the binomial test did
+not establish that recall was significantly greater
+than the target of 0.70 at the 0.05 significance
+level.
+
+For RQ3, the exact McNemar test indicated a
+statistically significant difference between the
+paired monitoring conditions (p = 0.015625).
+In this pilot experiment, access to reasoning traces
+was associated with improved detection compared
+with output-only monitoring.
+
+Overall, the findings provide preliminary evidence
+that reasoning traces may contain useful signals
+for monitoring unsafe behavior. However, larger
+datasets and more diverse monitoring systems are
+needed to validate this observation.
+
+\subsection{Future Work}
+
+Future work will focus on three directions. First,
+the evaluation dataset should be expanded to include
+more safe and unsafe examples across all four
+categories. Second, the keyword-based baseline
+should be compared with LLM-based monitoring
+approaches. Third, additional experiments should
+evaluate robustness, false-positive rates, and
+latency under more realistic workloads.
+
+These improvements will help determine whether
+reasoning-trace access provides consistent benefits
+for AI safety monitoring across different models
+and evaluation settings.
